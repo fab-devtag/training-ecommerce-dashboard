@@ -3,17 +3,25 @@ import { useMemo, useState } from "react";
 import { ProductGrid } from "../components/ProductGrid";
 import { Searchbar } from "../components/Searchbar";
 import { useProducts } from "../hooks/useProducts";
+import { CategoryFilter } from "../components/CategoryFilter";
 
 export default function ProductsPage() {
   const { data: products, isLoading, error } = useProducts();
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
-    return products.filter((product) =>
+
+    const searched = products.filter((product) =>
       product.title.toLowerCase().trim().includes(search.toLowerCase())
     );
-  }, [search, products]);
+
+    return searched.filter((product) => {
+      if (!category) return true;
+      return product.category === category;
+    });
+  }, [search, products, category]);
 
   if (isLoading)
     return (
@@ -33,6 +41,10 @@ export default function ProductsPage() {
     <div className="max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">All Products</h1>
       <Searchbar onSearch={setSearch} />
+      <CategoryFilter
+        selectedCategory={category}
+        onSelectCategory={setCategory}
+      />
       <div className="mb-4 text-sm text-gray-300">
         Showing {filteredProducts.length} products
       </div>

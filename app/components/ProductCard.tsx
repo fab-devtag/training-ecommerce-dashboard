@@ -23,6 +23,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             src={product.image}
             alt={product.title}
             fill
+            loading="eager"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-contain"
           />
         </div>
