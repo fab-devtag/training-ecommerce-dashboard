@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "../contexts/CartContext";
+import { useCart, useCartActions } from "../contexts/CartContext";
 import { Product } from "../lib/types";
 
 interface ProductCardProps {
@@ -9,7 +9,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
-  const { addItem } = useCart();
+  const { addItem } = useCartActions();
 
   const handleAddItem = () => {
     addItem(product);

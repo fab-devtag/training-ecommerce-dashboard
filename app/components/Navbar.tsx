@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useCart } from "../contexts/CartContext";
+import { useCart, useCartState } from "../contexts/CartContext";
 
 export const Navbar = () => {
-  const { itemCount } = useCart();
+  const { itemCount } = useCartState();
   return (
     <nav className="bg-black shadow-md shadow-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

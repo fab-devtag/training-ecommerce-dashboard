@@ -19,15 +19,17 @@ type CartAction =
   | { type: "UPDATE_QUANTITY"; productId: number; quantity: number }
   | { type: "CLEAR_CART" };
 
-//On peut même éventuellement extends CartItem ?
-interface CartContextType {
+interface CartStateContextType {
   items: CartItem[];
+  total: number;
+  itemCount: number;
+}
+
+interface CartActionContextType {
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
-  total: number;
-  itemCount: number;
 }
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -81,13 +83,14 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   }
 };
 
-const CartContext = createContext<CartContextType | null>(null);
+const CartStateContext = createContext<CartStateContextType | null>(null);
+const CartActionContext = createContext<CartActionContextType | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const initialState = { items: [] };
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  const addItem = useCallback((product: Product, quantity: number = 1) => {
+  /*  const addItem = useCallback((product: Product, quantity: number = 1) => {
     dispatch({ type: "ADD_ITEM", product: product, quantity: quantity });
   }, []);
 
@@ -106,36 +109,73 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const clearCart = useCallback(() => {
     dispatch({ type: "CLEAR_CART" });
   }, []);
-
-  const total = useMemo(() => {
+ */
+  /*   const total = useMemo(() => {
     return state.items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
+  }, [state.items]); */
+
+  const cartState = useMemo(() => {
+    const total = state.items.reduce(
+      (sum, item) => sum + item.product.price * item.quantity,
+      0
+    );
+    const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
+    return { items: state.items, total, itemCount };
   }, [state.items]);
 
-  const itemCount = useMemo(() => {
-    return state.items.reduce((sum, item) => sum + item.quantity, 0);
-  }, [state.items]);
+  const cartActions = useMemo(
+    () => ({
+      addItem: (product: Product, quantity: number = 1) => {
+        dispatch({ type: "ADD_ITEM", product: product, quantity: quantity });
+      },
+      removeItem: (productId: number) => {
+        dispatch({ type: "REMOVE_ITEM", productId: productId });
+      },
+      updateQuantity: (productId: number, quantity: number) => {
+        dispatch({
+          type: "UPDATE_QUANTITY",
+          productId: productId,
+          quantity: quantity,
+        });
+      },
+      clearCart: () => {
+        dispatch({ type: "CLEAR_CART" });
+      },
+    }),
+    []
+  );
+  return (
+    <CartStateContext.Provider value={cartState}>
+      <CartActionContext.Provider value={cartActions}>
+        {children}
+      </CartActionContext.Provider>
+    </CartStateContext.Provider>
+  );
+};
 
-  const values = useMemo(() => {
-    return {
-      items: state.items,
-      addItem,
-      removeItem,
-      updateQuantity,
-      clearCart,
-      total,
-      itemCount,
-    };
-  }, [state.items]);
-  return <CartContext.Provider value={values}>{children}</CartContext.Provider>;
+export const useCartState = () => {
+  const context = useContext(CartStateContext);
+
+  if (!context) throw new Error("useCartState must be use within CartProvider");
+
+  return context;
+};
+
+export const useCartActions = () => {
+  const context = useContext(CartActionContext);
+
+  if (!context)
+    throw new Error("useCartAction must be use within CartProvider");
+
+  return context;
 };
 
 export const useCart = () => {
-  const context = useContext(CartContext);
-
-  if (!context) throw new Error("useCart must be use within CartProvider");
-
-  return context;
+  return {
+    ...useCartState(),
+    ...useCartActions(),
+  };
 };

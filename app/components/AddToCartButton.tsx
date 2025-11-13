@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useCart } from "../contexts/CartContext";
+import { useCart, useCartActions } from "../contexts/CartContext";
 import { Product } from "../lib/types";
 
 interface AddToCartProps {
@@ -8,7 +8,7 @@ interface AddToCartProps {
 }
 
 export const AddToCartButton = ({ product }: AddToCartProps) => {
-  const { addItem } = useCart();
+  const { addItem } = useCartActions();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 

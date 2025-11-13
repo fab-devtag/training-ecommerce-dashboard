@@ -1,14 +1,15 @@
 import Image from "next/image";
 import { CartItem as CartItemTypes } from "../lib/types";
-import { useCart } from "../contexts/CartContext";
+import { useCart, useCartActions } from "../contexts/CartContext";
+import { memo } from "react";
 
 interface CartItemProps {
   item: CartItemTypes;
 }
 
-export const CartItem = ({ item }: CartItemProps) => {
-  const { removeItem, updateQuantity } = useCart();
-
+export const CartItem = memo(({ item }: CartItemProps) => {
+  const { removeItem, updateQuantity } = useCartActions();
+  console.log("🔄 CartItem render:", item.product.id);
   const subTotal = item.product.price * item.quantity;
 
   return (
@@ -53,4 +54,4 @@ export const CartItem = ({ item }: CartItemProps) => {
       </div>
     </div>
   );
-};
+});
