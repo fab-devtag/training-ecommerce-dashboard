@@ -13,7 +13,7 @@ export const CartItem = memo(({ item }: CartItemProps) => {
   const subTotal = item.product.price * item.quantity;
 
   return (
-    <div className="flex items-center gap-4 bg-black p-4 rounded-lg shadow-white shadow">
+    <div className="flex items-center gap-4 bg-black p-4 rounded-lg shadow-white shadow animate-slide-in">
       <div className="relative h-20 w-20 shrink-0">
         <Image
           src={item.product.image}

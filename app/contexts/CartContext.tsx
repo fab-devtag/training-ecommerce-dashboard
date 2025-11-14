@@ -6,8 +6,10 @@ import {
   useContext,
   useMemo,
   useReducer,
+  useState,
 } from "react";
 import { CartItem, Product } from "../lib/types";
+import { Toast } from "../components/Toast";
 
 interface CartState {
   items: CartItem[];
@@ -89,6 +91,7 @@ const CartActionContext = createContext<CartActionContextType | null>(null);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const initialState = { items: [] };
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const [notification, setNotification] = useState<string | null>(null);
 
   /*  const addItem = useCallback((product: Product, quantity: number = 1) => {
     dispatch({ type: "ADD_ITEM", product: product, quantity: quantity });
@@ -130,6 +133,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       addItem: (product: Product, quantity: number = 1) => {
         dispatch({ type: "ADD_ITEM", product: product, quantity: quantity });
+        setNotification(`${product.title} added to cart!`);
+        setTimeout(() => setNotification(null), 3000);
       },
       removeItem: (productId: number) => {
         dispatch({ type: "REMOVE_ITEM", productId: productId });
@@ -150,6 +155,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CartStateContext.Provider value={cartState}>
       <CartActionContext.Provider value={cartActions}>
+        {notification && (
+          <Toast message={notification} onClose={() => setNotification(null)} />
+        )}
         {children}
       </CartActionContext.Provider>
     </CartStateContext.Provider>

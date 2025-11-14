@@ -16,7 +16,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="bg-black rounded-lg shadow-white shadow-md hover:shadow-lg transition-shadow p-4">
+    <div className="bg-black rounded-lg shadow-white shadow-md hover:shadow-lg transition-all p-4 hover:scale-105 duration-300">
       <Link href={`/products/${product.id}`}>
         <div className="relative h-48 mb-4">
           <Image
@@ -39,7 +39,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </span>
         <button
           onClick={handleAddItem}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer hover:scale-95 duration-200"
         >
           Add to Cart
         </button>
