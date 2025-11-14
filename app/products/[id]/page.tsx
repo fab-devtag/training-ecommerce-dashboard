@@ -10,9 +10,17 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const { id } = await params;
-  const product: Product = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`
-  ).then((res) => res.json());
+
+  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+
+  if (!res.ok) {
+    return {
+      title: "Product Not Found",
+      description: "This product does not exist",
+    };
+  }
+
+  const product: Product = await res.json();
 
   return {
     title: product.title,
@@ -31,16 +39,17 @@ export default async function ProductDetailPage({
   params: { id: string };
 }) {
   const { id } = await params;
-  const product: Product = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`,
-    {
-      next: {
-        revalidate: 3600,
-      },
-    }
-  )
-    .then((res) => res.json())
-    .catch(() => notFound());
+
+  const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+    next: { revalidate: 3600 },
+  });
+
+  // ✅ Si 404, afficher la page not-found
+  if (!res.ok) {
+    notFound();
+  }
+
+  const product: Product = await res.json();
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -54,24 +63,32 @@ export default async function ProductDetailPage({
               className="object-contain"
             />
           </div>
+
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
+
             <div className="flex items-center gap-2 mb-4">
               <span className="text-yellow-500">⭐</span>
               <span className="font-semibold">{product.rating.rate}</span>
-              <span className="text-gray-400">{product.rating.count}</span>
+              <span className="text-gray-400">
+                ({product.rating.count} reviews)
+              </span>
             </div>
+
             <p className="text-3xl font-bold text-blue-300 mb-6">
               ${product.price.toFixed(2)}
             </p>
+
             <p className="text-gray-300 mb-6 leading-relaxed">
               {product.description}
             </p>
+
             <div className="mb-6">
               <span className="inline-block bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold capitalize">
                 {product.category}
               </span>
             </div>
+
             <AddToCartButton product={product} />
           </div>
         </div>
