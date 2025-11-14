@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 E-Commerce Dashboard
 
-## Getting Started
+A modern e-commerce dashboard built with Next.js 14, React Query, and TypeScript.
 
-First, run the development server:
+## 🚀 Live Demo
 
+[View Demo](https://ton-app.vercel.app)
+
+## ✨ Features
+
+- 📦 Product listing with search and filters
+- 🛍️ Shopping cart with quantity management
+- 📊 Dashboard with statistics
+- 🎨 Modern UI with Tailwind CSS
+- ⚡ Optimized with React Query caching
+- 🧪 Unit tested with Jest & Testing Library
+- 📱 Fully responsive
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **State Management:** Context API + useReducer
+- **Data Fetching:** React Query
+- **Testing:** Jest + React Testing Library
+- **Deployment:** Vercel
+
+## 🏗️ Architecture
+
+- **Server Components** for data fetching and SEO
+- **Client Components** for interactivity
+- **React Query** for caching and data synchronization
+- **Context API** with optimized re-renders (separated state/actions)
+
+## 🚀 Getting Started
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Project Structure
+```
+├── app/                  # Next.js pages (App Router)
+├── components/           # Reusable components
+├── contexts/            # React Context providers
+├── hooks/               # Custom hooks
+├── lib/                 # Types and utilities
+└── __tests__/           # Unit tests
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧪 Testing
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📈 Performance
 
-## Learn More
+- ⚡ Optimized re-renders with separated contexts
+- 🗄️ React Query caching (5min stale time)
+- 🎨 Lazy loading with Next.js Image
+- 📦 Code splitting with dynamic imports
 
-To learn more about Next.js, take a look at the following resources:
+## 📝 License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+MIT
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Made with ❤️ using Next.js
