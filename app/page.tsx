@@ -6,39 +6,25 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   try {
-    console.log("🚀 Fetching products...");
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
 
     const [productsRes, categoriesRes] = await Promise.all([
-      fetch("https://fakestoreapi.com/products", {
-        cache: "no-store",
-        next: { revalidate: 0 }, // ✅ Ajoute ça aussi
-      }),
-      fetch("https://fakestoreapi.com/products/categories", {
-        cache: "no-store",
-        next: { revalidate: 0 },
-      }),
+      fetch(`${baseUrl}/api/products`, { cache: "no-store" }),
+      fetch(`${baseUrl}/api/categories`, { cache: "no-store" }),
     ]);
-
-    console.log("📊 Products response status:", productsRes.status);
-    console.log("📊 Categories response status:", categoriesRes.status);
 
     const products: Product[] = productsRes.ok ? await productsRes.json() : [];
     const categories: string[] = categoriesRes.ok
       ? await categoriesRes.json()
       : [];
 
-    console.log("✅ Products loaded:", products.length);
-    console.log("✅ Categories loaded:", categories.length);
-
     if (products.length === 0) {
-      console.error("❌ No products loaded!");
       return (
         <div className="max-w-7xl mx-auto p-8">
           <h1 className="text-2xl font-bold text-red-500">Error</h1>
-          <p>Failed to load products. API might be down.</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Status: {productsRes.status} {productsRes.statusText}
-          </p>
+          <p>Failed to load products.</p>
         </div>
       );
     }
@@ -60,14 +46,10 @@ export default async function DashboardPage() {
       </div>
     );
   } catch (error) {
-    console.error("❌ Unexpected error:", error);
     return (
       <div className="max-w-7xl mx-auto p-8">
         <h1 className="text-2xl font-bold text-red-500">Error</h1>
         <p>An unexpected error occurred.</p>
-        <p className="text-sm text-gray-500 mt-2">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
       </div>
     );
   }
