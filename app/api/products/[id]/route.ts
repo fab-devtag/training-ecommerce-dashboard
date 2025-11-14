@@ -2,13 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // ✔ ici c'est une promesse
 ) {
-  const { id } = context.params;
+  const { id } = await context.params; // ✔ il faut await
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing product id" }, { status: 400 });
-  }
+  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {
     const res = await fetch(`https://fakestoreapi.com/products/${id}`);
@@ -17,8 +15,8 @@ export async function GET(
     }
     const product = await res.json();
     return NextResponse.json(product);
-  } catch (error) {
-    console.error("Error fetching product:", error);
+  } catch (err) {
+    console.error(err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
