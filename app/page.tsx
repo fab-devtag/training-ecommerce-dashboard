@@ -6,7 +6,7 @@ import { StatsCard } from "./components/StatsCard";
 export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const products: Product[] = await fetch(
-    "https://fakestoreapi.com/products/",
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products`,
     {
       next: {
         revalidate: 60,
@@ -17,7 +17,7 @@ export default async function DashboardPage() {
     .catch(() => notFound());
 
   const categories = await fetch(
-    "https://fakestoreapi.com/products/categories",
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/categories`,
     {
       next: {
         revalidate: 60,

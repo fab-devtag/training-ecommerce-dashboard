@@ -4,7 +4,6 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
@@ -12,7 +11,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const product: Product = await fetch(
-    `https://fakestoreapi.com/products/${id}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`
   ).then((res) => res.json());
 
   return {
@@ -33,7 +32,7 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
   const product: Product = await fetch(
-    `https://fakestoreapi.com/products/${id}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`,
     {
       next: {
         revalidate: 3600,
