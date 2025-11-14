@@ -1,143 +1,80 @@
-import { AddToCartButton } from "@/app/components/AddToCartButton";
-import { Product } from "@/app/lib/types";
-import { Metadata } from "next";
-import Image from "next/image";
-import { notFound } from "next/navigation";
+"use client";
+import { useMemo, useState } from "react";
+import { ProductGrid } from "../components/ProductGrid";
+import { Searchbar } from "../components/Searchbar";
+import { useProducts } from "../hooks/useProducts";
+import { CategoryFilter } from "../components/CategoryFilter";
+import { ProductSkeleton } from "../components/ProductSkeleton";
 
-// ✅ Génère les métadonnées avec fallback
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const { id } = await params;
+export default function ProductsPage() {
+  const { data: products, isLoading, error } = useProducts();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<string | null>(null);
 
-  try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-      next: { revalidate: 3600 }, // ISR 1 heure
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+
+    const searched = products.filter((product) =>
+      product.title.toLowerCase().trim().includes(search.toLowerCase())
+    );
+
+    return searched.filter((product) => {
+      if (!category) return true;
+      return product.category === category;
     });
+  }, [search, products, category]);
 
-    if (!res.ok) {
-      return {
-        title: "Product Not Found",
-        description: "This product does not exist",
-      };
-    }
-
-    const product: Product = await res.json();
-
-    return {
-      title: product.title,
-      description: product.description,
-      openGraph: {
-        title: product.title,
-        description: product.description,
-        images: [product.image],
-      },
-    };
-  } catch (error) {
-    // ✅ Fallback metadata si le fetch échoue
-    return {
-      title: "Product",
-      description: "Loading product details...",
-    };
-  }
-}
-
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = await params;
-
-  let product: Product | null = null;
-  let fetchError = false;
-
-  try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-      next: { revalidate: 3600 }, // ✅ ISR 1 heure
-    });
-
-    if (res.ok) {
-      product = await res.json();
-    } else if (res.status === 404) {
-      // ✅ Si vraiment 404, afficher la page not-found
-      notFound();
-    }
-  } catch (error) {
-    fetchError = true;
-    console.error("Product fetch error:", error);
-  }
-
-  // ✅ Fallback UI si pas de produit (mais pas un 404)
-  if (!product) {
+  if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
-          <p className="font-bold">⏳ Loading product...</p>
-          <p className="text-sm">
-            {fetchError
-              ? "Failed to load product. Please try again later."
-              : "The page will refresh automatically."}
-          </p>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
         </div>
-        {fetchError && (
-          <a
-            href="/products"
-            className="inline-block mt-4 text-blue-600 hover:text-blue-800"
-          >
-            ← Back to products
-          </a>
-        )}
       </div>
     );
   }
 
+  if (error)
+    return (
+      <div className="max-w-7xl mx-auto text-center py-12 text-red-600">
+        Error loading products: {error.message}
+      </div>
+    );
+
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="bg-black rounded-lg shadow-white shadow-lg p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Image */}
-          <div className="relative h-96">
-            <Image
-              src={product.image}
-              alt={product.title}
-              fill
-              className="object-contain"
-            />
-          </div>
-
-          {/* Info */}
-          <div>
-            <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
-
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-yellow-500">⭐</span>
-              <span className="font-semibold">{product.rating.rate}</span>
-              <span className="text-gray-400">
-                ({product.rating.count} reviews)
-              </span>
-            </div>
-
-            <p className="text-3xl font-bold text-blue-300 mb-6">
-              ${product.price.toFixed(2)}
-            </p>
-
-            <p className="text-gray-300 mb-6 leading-relaxed">
-              {product.description}
-            </p>
-
-            <div className="mb-6">
-              <span className="inline-block bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold capitalize">
-                {product.category}
-              </span>
-            </div>
-
-            <AddToCartButton product={product} />
-          </div>
-        </div>
+      <h1 className="text-3xl font-bold mb-8">All Products</h1>
+      <Searchbar onSearch={setSearch} />
+      <CategoryFilter
+        selectedCategory={category}
+        onSelectCategory={setCategory}
+      />
+      <div className="mb-4 text-sm text-gray-300">
+        Showing {filteredProducts.length} products
       </div>
+      <ProductGrid products={filteredProducts} />
+      {filteredProducts.length === 0 && (
+        <div className="col-span-full text-center py-16">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-2xl font-bold text-gray-700 mb-2">
+            No products found
+          </h3>
+          <p className="text-gray-500 mb-6">
+            Try adjusting your search or filters
+          </p>
+          <button
+            onClick={() => {
+              setSearch("");
+              setCategory(null);
+            }}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
     </div>
   );
 }

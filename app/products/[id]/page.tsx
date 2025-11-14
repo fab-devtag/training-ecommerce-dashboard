@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+// ✅ Génère les métadonnées avec fallback
 export async function generateMetadata({
   params,
 }: {
@@ -11,26 +12,36 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
 
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+  try {
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+      next: { revalidate: 3600 }, // ISR 1 heure
+    });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return {
+        title: "Product Not Found",
+        description: "This product does not exist",
+      };
+    }
+
+    const product: Product = await res.json();
+
     return {
-      title: "Product Not Found",
-      description: "This product does not exist",
-    };
-  }
-
-  const product: Product = await res.json();
-
-  return {
-    title: product.title,
-    description: product.description,
-    openGraph: {
       title: product.title,
       description: product.description,
-      images: [product.image],
-    },
-  };
+      openGraph: {
+        title: product.title,
+        description: product.description,
+        images: [product.image],
+      },
+    };
+  } catch (error) {
+    // ✅ Fallback metadata si le fetch échoue
+    return {
+      title: "Product",
+      description: "Loading product details...",
+    };
+  }
 }
 
 export default async function ProductDetailPage({
@@ -40,21 +51,54 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
 
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-    next: { revalidate: 3600 },
-  });
+  let product: Product | null = null;
+  let fetchError = false;
 
-  // ✅ Si 404, afficher la page not-found
-  if (!res.ok) {
-    notFound();
+  try {
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+      next: { revalidate: 3600 }, // ✅ ISR 1 heure
+    });
+
+    if (res.ok) {
+      product = await res.json();
+    } else if (res.status === 404) {
+      // ✅ Si vraiment 404, afficher la page not-found
+      notFound();
+    }
+  } catch (error) {
+    fetchError = true;
+    console.error("Product fetch error:", error);
   }
 
-  const product: Product = await res.json();
+  // ✅ Fallback UI si pas de produit (mais pas un 404)
+  if (!product) {
+    return (
+      <div className="max-w-7xl mx-auto p-8">
+        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
+          <p className="font-bold">⏳ Loading product...</p>
+          <p className="text-sm">
+            {fetchError
+              ? "Failed to load product. Please try again later."
+              : "The page will refresh automatically."}
+          </p>
+        </div>
+        {fetchError && (
+          <a
+            href="/products"
+            className="inline-block mt-4 text-blue-600 hover:text-blue-800"
+          >
+            ← Back to products
+          </a>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
       <div className="bg-black rounded-lg shadow-white shadow-lg p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Image */}
           <div className="relative h-96">
             <Image
               src={product.image}
@@ -64,6 +108,7 @@ export default async function ProductDetailPage({
             />
           </div>
 
+          {/* Info */}
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
 
