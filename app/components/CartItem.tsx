@@ -14,7 +14,6 @@ export const CartItem = memo(({ item }: CartItemProps) => {
 
   return (
     <div className="flex items-center gap-4 bg-black p-4 rounded-lg shadow-white shadow animate-slide-in">
-      <div className="bg-red-500">Test</div>
       <div className="relative h-20 w-20 shrink-0">
         <Image
           src={item.product.image}

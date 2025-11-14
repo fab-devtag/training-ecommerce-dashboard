@@ -5,27 +5,30 @@ import { StatsCard } from "./components/StatsCard";
 import { Searchbar } from "./components/Searchbar";
 
 export default async function DashboardPage() {
-  const products: Product[] = await fetch(
-    "https://fakestoreapi.com/products/",
-    {
-      next: {
-        revalidate: 60,
-      },
-    }
-  )
-    .then((res) => res.json())
-    .catch(() => notFound());
+  const res = await fetch("https://fakestoreapi.com/products/", {
+    next: {
+      revalidate: 60,
+    },
+  });
 
-  const categories = await fetch(
+  if (!res.ok) throw new Error(`Failed to fetch products: ${res.status}`);
+
+  const products: Product[] = await res.json();
+
+  const resCategories = await fetch(
     "https://fakestoreapi.com/products/categories",
     {
       next: {
         revalidate: 60,
       },
     }
-  )
-    .then((res) => res.json())
-    .catch(() => notFound());
+  );
+
+  if (!resCategories.ok) {
+    throw new Error(`Failed to fetch categories: ${resCategories.status}`);
+  }
+
+  const categories = await resCategories.json();
 
   const front4Products = products.slice(0, 4);
 

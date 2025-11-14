@@ -10,10 +10,11 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const { id } = await params;
-  const product: Product = await fetch(
-    `https://fakestoreapi.com/products/${id}`
-  ).then((res) => res.json());
+  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
 
+  if (!res.ok) throw new Error(`Failed to fetch product: ${res.status}`);
+
+  const product: Product = await res.json();
   return {
     title: product.title,
     description: product.description,
