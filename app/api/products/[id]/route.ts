@@ -1,14 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
-  const { id } = await params;
+  const { id } = context.params;
 
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
-  if (!res.ok) return NextResponse.error();
+  if (!id) {
+    return NextResponse.json({ error: "Missing product id" }, { status: 400 });
+  }
 
-  const product = await res.json();
-  return NextResponse.json(product);
+  try {
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+    if (!res.ok) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    const product = await res.json();
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

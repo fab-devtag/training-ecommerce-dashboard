@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({
+/* export async function generateMetadata({
   params,
 }: {
   params: { id: string };
@@ -23,7 +23,7 @@ export async function generateMetadata({
       images: [product.image],
     },
   };
-}
+} */
 
 export default async function ProductDetailPage({
   params,
