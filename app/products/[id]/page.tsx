@@ -4,17 +4,17 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
   params: { id: string };
 }): Promise<Metadata> {
   const { id } = await params;
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+  const product: Product = await fetch(
+    `https://fakestoreapi.com/products/${id}`
+  ).then((res) => res.json());
 
-  if (!res.ok) throw new Error(`Failed to fetch product: ${res.status}`);
-
-  const product: Product = await res.json();
   return {
     title: product.title,
     description: product.description,

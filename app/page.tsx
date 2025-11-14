@@ -2,33 +2,30 @@ import { ProductGrid } from "./components/ProductGrid";
 import { Product } from "./lib/types";
 import { notFound } from "next/navigation";
 import { StatsCard } from "./components/StatsCard";
-import { Searchbar } from "./components/Searchbar";
 
+export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
-  const res = await fetch("https://fakestoreapi.com/products/", {
-    next: {
-      revalidate: 60,
-    },
-  });
+  const products: Product[] = await fetch(
+    "https://fakestoreapi.com/products/",
+    {
+      next: {
+        revalidate: 60,
+      },
+    }
+  )
+    .then((res) => res.json())
+    .catch(() => notFound());
 
-  if (!res.ok) throw new Error(`Failed to fetch products: ${res.status}`);
-
-  const products: Product[] = await res.json();
-
-  const resCategories = await fetch(
+  const categories = await fetch(
     "https://fakestoreapi.com/products/categories",
     {
       next: {
         revalidate: 60,
       },
     }
-  );
-
-  if (!resCategories.ok) {
-    throw new Error(`Failed to fetch categories: ${resCategories.status}`);
-  }
-
-  const categories = await resCategories.json();
+  )
+    .then((res) => res.json())
+    .catch(() => notFound());
 
   const front4Products = products.slice(0, 4);
 
