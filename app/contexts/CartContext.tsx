@@ -134,7 +134,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       addItem: (product: Product, quantity: number = 1) => {
         dispatch({ type: "ADD_ITEM", product: product, quantity: quantity });
         setNotification(`${product.title} added to cart!`);
-        setTimeout(() => setNotification(null), 3000);
       },
       removeItem: (productId: number) => {
         dispatch({ type: "REMOVE_ITEM", productId: productId });
