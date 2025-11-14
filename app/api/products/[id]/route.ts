@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (
-  request: NextRequest,
+export async function GET(
+  request: Request,
   { params }: { params: { id: string } }
-) => {
+) {
   const { id } = await params;
 
   const res = await fetch(`https://fakestoreapi.com/products/${id}`);
@@ -11,4 +11,4 @@ export const GET = async (
 
   const product = await res.json();
   return NextResponse.json(product);
-};
+}
