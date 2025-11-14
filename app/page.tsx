@@ -1,33 +1,54 @@
 import { ProductGrid } from "./components/ProductGrid";
 import { Product } from "./lib/types";
-import { notFound } from "next/navigation";
 import { StatsCard } from "./components/StatsCard";
 
 export default async function DashboardPage() {
-  // ✅ Fetch avec vérification res.ok
-  const productsRes = await fetch("https://fakestoreapi.com/products", {
-    next: { revalidate: 60 },
-  });
+  // ✅ ISR avec fallback
+  let products: Product[] = [];
+  let categories: string[] = [];
 
-  if (!productsRes.ok) {
-    throw new Error("Failed to fetch products");
-  }
+  try {
+    const productsRes = await fetch("https://fakestoreapi.com/products", {
+      next: { revalidate: 60 }, // ✅ ISR 60 secondes
+    });
 
-  const products: Product[] = await productsRes.json();
-
-  // ✅ Pareil pour categories
-  const categoriesRes = await fetch(
-    "https://fakestoreapi.com/products/categories",
-    {
-      next: { revalidate: 60 },
+    if (productsRes.ok) {
+      products = await productsRes.json();
     }
-  );
-
-  if (!categoriesRes.ok) {
-    throw new Error("Failed to fetch categories");
+  } catch (error) {
+    console.error("Failed to fetch products during build:", error);
+    // ✅ Le build continue même si le fetch échoue
   }
 
-  const categories: string[] = await categoriesRes.json();
+  try {
+    const categoriesRes = await fetch(
+      "https://fakestoreapi.com/products/categories",
+      {
+        next: { revalidate: 60 },
+      }
+    );
+
+    if (categoriesRes.ok) {
+      categories = await categoriesRes.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch categories during build:", error);
+  }
+
+  // ✅ Afficher quelque chose même si products = []
+  if (products.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto p-8">
+        <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+          <p className="font-bold">Loading products...</p>
+          <p className="text-sm">
+            The page will update automatically with fresh data.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const front4Products = products.slice(0, 4);
 
