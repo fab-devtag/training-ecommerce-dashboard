@@ -9,7 +9,7 @@ export default async function DashboardPage() {
 
   try {
     const productsRes = await fetch("https://fakestoreapi.com/products", {
-      next: { revalidate: 60 }, // ✅ ISR 60 secondes
+      next: { revalidate: 1 }, // ✅ ISR 60 secondes
     });
 
     if (productsRes.ok) {
@@ -24,7 +24,7 @@ export default async function DashboardPage() {
     const categoriesRes = await fetch(
       "https://fakestoreapi.com/products/categories",
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 1 },
       }
     );
 
