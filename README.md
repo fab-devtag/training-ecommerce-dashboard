@@ -4,7 +4,7 @@ A modern e-commerce dashboard built with Next.js 14, React Query, and TypeScript
 
 ## 🚀 Live Demo
 
-[View Demo](https://ton-app.vercel.app)
+[View Demo]https://training-ecommerce-dashboard.vercel.app/
 
 ## ✨ Features
 
@@ -63,18 +63,3 @@ npm run build
 npm test              # Run all tests
 npm run test:watch    # Watch mode
 ```
-
-## 📈 Performance
-
-- ⚡ Optimized re-renders with separated contexts
-- 🗄️ React Query caching (5min stale time)
-- 🎨 Lazy loading with Next.js Image
-- 📦 Code splitting with dynamic imports
-
-## 📝 License
-
-MIT
-
----
-
-Made with ❤️ using Next.js
