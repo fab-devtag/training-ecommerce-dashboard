@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCart, useCartActions } from "../contexts/CartContext";
 import { Product } from "../lib/types";
+import { AddToWishList } from "./AddToWishList";
+import { useWishList } from "../hooks/useWishList";
 
 interface ProductCardProps {
   product: Product;
@@ -14,7 +16,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const handleAddItem = () => {
     addItem(product);
   };
-
   return (
     <div className="bg-black rounded-lg shadow-white shadow-md hover:shadow-lg transition-all p-4 hover:scale-105 duration-300">
       <Link href={`/products/${product.id}`}>
@@ -44,6 +45,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           Add to Cart
         </button>
       </div>
+      <AddToWishList product={product} />
     </div>
   );
 };

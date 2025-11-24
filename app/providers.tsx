@@ -2,6 +2,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 import { CartProvider } from "./contexts/CartContext";
+import { WishListProvider } from "./contexts/WishListContext";
 
 export const Providers = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(
@@ -17,7 +18,9 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   );
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>{children}</CartProvider>
+      <CartProvider>
+        <WishListProvider>{children}</WishListProvider>
+      </CartProvider>
     </QueryClientProvider>
   );
 };
